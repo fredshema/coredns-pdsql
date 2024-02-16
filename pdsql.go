@@ -2,10 +2,11 @@
 package pdsql
 
 import (
-	"github.com/wenerme/coredns-pdsql/pdnsmodel"
 	"net"
 	"strconv"
 	"strings"
+
+	"github.com/wenerme/coredns-pdsql/pdnsmodel"
 
 	"github.com/coredns/coredns/plugin"
 	"github.com/coredns/coredns/request"
@@ -99,6 +100,11 @@ func (pdb PowerDNSGenericSQLBackend) ServeDNS(ctx context.Context, w dns.Respons
 				} else {
 					rr.Ptr = v.Content + "."
 				}
+			case *dns.SRV:
+				rr.Hdr = hrd
+				if !ParseSRV(rr, v.Content) {
+					rr = nil
+				}
 			default:
 				// drop unsupported
 			}
@@ -187,6 +193,30 @@ func ParseSOA(rr *dns.SOA, line string) bool {
 	} else {
 		rr.Minttl = uint32(i)
 	}
+	return true
+}
+
+func ParseSRV(rr *dns.SRV, line string) bool {
+	splites := strings.Split(line, " ")
+	if len(splites) < 4 {
+		return false
+	}
+	if i, err := strconv.Atoi(splites[0]); err != nil {
+		return false
+	} else {
+		rr.Priority = uint16(i)
+	}
+	if i, err := strconv.Atoi(splites[1]); err != nil {
+		return false
+	} else {
+		rr.Weight = uint16(i)
+	}
+	if i, err := strconv.Atoi(splites[2]); err != nil {
+		return false
+	} else {
+		rr.Port = uint16(i)
+	}
+	rr.Target = splites[3]
 	return true
 }
 
