@@ -180,7 +180,12 @@ func (pdb PowerDNSGenericSQLBackend) ServeDNS(ctx context.Context, w dns.Respons
 	}
 
 	if len(a.Answer) == 0 {
-		return plugin.NextOrFailure(pdb.Name(), pdb.Next, ctx, w, r)
+		if pdb.Next != nil {
+			return plugin.NextOrFailure(pdb.Name(), pdb.Next, ctx, w, r)
+		}
+		// No next handler, return NXDOMAIN
+		a.Rcode = dns.RcodeNameError
+		return 0, w.WriteMsg(a)
 	}
 
 	return 0, w.WriteMsg(a)
