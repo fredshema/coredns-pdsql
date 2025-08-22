@@ -5,8 +5,8 @@ import (
 	"net"
 	"testing"
 
-	pdsql "github.com/wenerme/coredns-pdsql"
-	"github.com/wenerme/coredns-pdsql/pdnsmodel"
+	pdsql "github.com/fredshema/coredns-pdsql"
+	"github.com/fredshema/coredns-pdsql/pdnsmodel"
 
 	"github.com/coredns/coredns/plugin/pkg/dnstest"
 	"github.com/coredns/coredns/plugin/test"
@@ -41,7 +41,7 @@ func TestPowerDNSSQL(t *testing.T) {
 	}
 
 	testDomains := map[string]*pdnsmodel.Domain{
-		"example.org": &pdnsmodel.Domain{Name: "example.org", Type: "NATIVE"},
+		"example.org": {Name: "example.org", Type: "NATIVE"},
 	}
 
 	for _, d := range testDomains {
